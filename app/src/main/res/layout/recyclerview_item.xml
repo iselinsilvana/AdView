@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:orientation="vertical">
+    <FrameLayout
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:background="@drawable/rounded_corners_image">
+        <ImageView
+                android:id="@+id/iv_item_photo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@mipmap/ic_launcher"/>
+        <ImageButton
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_launcher_foreground"
+                android:layout_gravity="end"
+                android:layout_margin="8dp"/>
+        <TextView
+                android:id="@+id/tv_item_price"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_gravity="bottom"
+                android:background="@drawable/rounded_corner_price"
+                android:padding="8dp"
+                android:fontFamily="sans-serif"
+                android:textStyle="bold"
+                android:textColor="#ffffff"
+                tools:text="500 kr"/>
+
+    </FrameLayout>
+
+    <TextView
+            android:id="@+id/tv_item_place"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Stad"/>
+    <TextView
+            android:id="@+id/tv_item_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Tittel"/>
+
+</LinearLayout>
