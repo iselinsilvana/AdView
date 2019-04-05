@@ -3,8 +3,16 @@ package com.example.adview
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
+import com.example.adview.adapters.AdAdapter
+import com.example.adview.model.Ad
+import com.example.adview.network.RetrofitFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewManager: GridLayoutManager
@@ -15,13 +23,36 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        viewManager = GridLayoutManager(this, 2)
-        viewAdapter = AdAdapter(myDataset)
+        val service = RetrofitFactory.makeRetrofitService()
+        CoroutineScope(Dispatchers.IO).launch {
+            val request = service.getAds()
+            try {
+                val response = request.await()
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        response.body()?.let { initRecyclerView(it) }
+                    } else {
+                        // toast("Error network operation failed with ${response.code()}") <-- finn ut koffor toast ikkje blei godkjent
+                        Log.e("REQUEST","Error network operation failed with ${response.code()}" )
+                    }
+                }
+            } catch (e: HttpException) {
+                Log.e("REQUEST", "Exception ${e.message}")
+            } catch (e: Throwable) {
+                Log.e("REQUEST", "Something else went wrong")
+            }
+        }
+    }
 
-        recyclerView = findViewById<RecyclerView>(R.id.recycler_view).apply {
-            setHasFixedSize(true)
-            layoutManager = viewManager
-            adapter = viewAdapter
+        private fun initRecyclerView( listOfAds: List<Ad>) {
+            viewManager = GridLayoutManager(this, 2)
+            viewAdapter = AdAdapter(listOfAds)
+
+            recyclerView = findViewById<RecyclerView>(R.id.recycler_view).apply {
+                setHasFixedSize(true)
+                layoutManager = viewManager
+                adapter = viewAdapter
+
         }
     }
 }
