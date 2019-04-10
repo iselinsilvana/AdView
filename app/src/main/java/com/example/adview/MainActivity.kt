@@ -13,6 +13,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import android.support.v7.widget.LinearLayoutManager
+
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewManager: GridLayoutManager
@@ -23,6 +26,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        initRecyclerView(emptyList())
+
         val service = RetrofitFactory.makeRetrofitService()
         CoroutineScope(Dispatchers.IO).launch {
             val request = service.getAds()
@@ -30,7 +35,7 @@ class MainActivity : AppCompatActivity() {
                 val response = request.await()
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
-                        response.body()?.let { initRecyclerView(it) }
+                        response.body()?.let { initRecyclerView(it.adList) }
                     } else {
                         // toast("Error network operation failed with ${response.code()}") <-- finn ut koffor toast ikkje blei godkjent
                         Log.e("REQUEST","Error network operation failed with ${response.code()}" )
@@ -39,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             } catch (e: HttpException) {
                 Log.e("REQUEST", "Exception ${e.message}")
             } catch (e: Throwable) {
-                Log.e("REQUEST", "Something else went wrong")
+                Log.e("REQUEST", "$e")
             }
         }
     }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">AdView</string>
+    <string name="kr">%s\ kr</string>
 </resources>
