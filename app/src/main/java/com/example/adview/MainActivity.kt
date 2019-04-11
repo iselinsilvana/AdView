@@ -1,10 +1,11 @@
 package com.example.adview
 
-import android.support.v7.app.AppCompatActivity
+
 import android.os.Bundle
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.adview.adapters.AdAdapter
 import com.example.adview.model.Ad
 import com.example.adview.network.RetrofitFactory
@@ -13,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
-import android.support.v7.widget.LinearLayoutManager
 
 
 
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             } catch (e: HttpException) {
                 Log.e("REQUEST", "Exception ${e.message}")
             } catch (e: Throwable) {
-                Log.e("REQUEST", "$e")
+                Log.e("REQUEST", "Exception ${e.message}")
             }
         }
     }

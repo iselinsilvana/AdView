@@ -1,26 +1,21 @@
 package com.example.adview.model
 
-import android.accounts.AuthenticatorDescription
-import android.util.Log
 import com.squareup.moshi.Json
-import java.text.DecimalFormat
-import java.util.*
 
 data class AdResponse(
     @field:Json(name = "items") val adList: List<Ad>
 )
 
-data class Ad(val id: Long,
-              val description: String?,
-              val location: String?,
-              val price: Price?,
-              val image: Image?)
+data class Ad(@field:Json(name = "id") val id: Long,
+              @field:Json(name = "description") val description: String?,
+              @field:Json(name = "location") val location: String?,
+              @field:Json(name = "price") val price: Price?,
+              @field:Json(name = "image") val image: Image?)
 
 data class Image(
-    val url: String     //bruke string, eller noko anna?
+    @field:Json(name = "url") val url: String     //bruke string, eller noko anna?
 )
 
 data class Price(
-    val value: Int        //har eg aldri desimal?
-
+    @field:Json(name = "value") val value: Int        //har eg aldri desimal? kan holde opp til 9 nuller, bør bruke long for mulighet til å holde fleire?
 )

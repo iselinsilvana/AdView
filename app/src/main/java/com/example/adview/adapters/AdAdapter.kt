@@ -1,19 +1,16 @@
 package com.example.adview.adapters
 
-import android.support.v7.widget.RecyclerView
-import android.util.Log
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.adview.R
 import com.example.adview.model.Ad
-import com.example.adview.model.Image
 import java.text.DecimalFormat
-import java.text.NumberFormat
-import java.util.*
 
 class AdAdapter(private val adList: List<Ad>) :
         RecyclerView.Adapter<AdAdapter.AdViewHolder>() {
@@ -51,7 +48,7 @@ class AdAdapter(private val adList: List<Ad>) :
                 "no price info"
             }
             else {
-               "${dec.format( currentAd.price.value ).toString()} kr"
+               "${dec.format( currentAd.price.value )} kr"
             }
             tvPrice.text = price
             tvPlace.text = currentAd.location ?: "no location"
