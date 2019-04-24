@@ -4,6 +4,7 @@ package com.example.adview
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.adview.adapters.AdAdapter
@@ -18,6 +19,7 @@ import retrofit2.HttpException
 
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var viewModel: AdViewModel
     private lateinit var viewManager: GridLayoutManager
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
@@ -26,8 +28,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        initRecyclerView(emptyList())
+        viewModel = ViewModelProviders.of(this).get(AdViewModel::class.java)
 
+        initRecyclerView(emptyList())
+/*
         val service = RetrofitFactory.makeRetrofitService()
         CoroutineScope(Dispatchers.IO).launch {
             val request = service.getAds()
@@ -47,6 +51,7 @@ class MainActivity : AppCompatActivity() {
                 Log.e("REQUEST", "Exception ${e.message}")
             }
         }
+        */
     }
 
         private fun initRecyclerView( listOfAds: List<Ad>) {

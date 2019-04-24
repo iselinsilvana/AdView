@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitFactory {
     const val BASE_URL ="https://gist.githubusercontent.com/"
-    val key = "3lvis/3799feea005ed49942dcb56386ecec2b/raw/63249144485884d279d55f4f3907e37098f55c74/discover.json"
+   // val key = "3lvis/3799feea005ed49942dcb56386ecec2b/raw/63249144485884d279d55f4f3907e37098f55c74/discover.json"
 
     fun makeRetrofitService(): RetrofitService {
         return Retrofit.Builder()
