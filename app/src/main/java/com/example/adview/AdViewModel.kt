@@ -3,14 +3,16 @@ package com.example.adview
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.adview.database.FavouriteAd
 import com.example.adview.model.Ad
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 
-class AdViewModel(adsRepository: AdsRepository, application: Application) : AndroidViewModel(application) {
+class AdViewModel(application: Application) : AndroidViewModel(application) {
 
+    lateinit var adsRepository: AdsRepository
     // viewModelJob allows us to cancel all coroutines started by this ViewModel.
     private var viewModelJob = Job()
     /**
@@ -24,43 +26,33 @@ class AdViewModel(adsRepository: AdsRepository, application: Application) : Andr
      * a [ViewModel] update the UI after performing some processing.
      */
 
-    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+    // ka trenger eg denne til ?
+    //private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     //private val currentAd = Ad?
-    private val favouriteAds = adsRepository.getAllFavouriteAds()
-    private val favouriteIds = adsRepository.getAllFavouriteIds()
-    private val allAds = adsRepository.getAllAds()
+    //Henter repository
+    lateinit var favouriteAds : LiveData<List<FavouriteAd?>>
+    lateinit var favouriteIds : LiveData<List<Long>?>
+    lateinit var allAds : MutableLiveData<List<Ad>?>
 
-    fun addToFavourites(currentAd: Ad, adsRepository: AdsRepository) {
+    fun vievModelConnectToDataSource() {
+        adsRepository = AdsRepository(getApplication())
+        favouriteAds = adsRepository.getAllFavouriteAds()
+        favouriteIds = adsRepository.getAllFavouriteIds()
+        allAds = adsRepository.getAllAds()
+    }
+    fun viewModelConnectToAllAds () : MutableLiveData<List<Ad>?>{
+        adsRepository = AdsRepository(getApplication())
+        return adsRepository.getAllAds()
+    }
+
+    fun addToFavourites(currentAd: Ad) {
         val newFavourite = FavouriteAd(currentAd.id, currentAd.description, currentAd.location, currentAd.price?.value)
         adsRepository.addToFavourites(newFavourite)
     }
 
-    fun removeFromFavourites(currentAd: Ad, adsRepository: AdsRepository) {
+    fun removeFromFavourites(currentAd: Ad) {
         adsRepository.removeFromFavourites(currentAd.id)
     }
 
 }
 
-/*
-tglHeart.setOnCheckedChangeListener { _, isChecked ->
-    if (isChecked) {
-        val newFavourite = FavouriteAd(currentAd.id, currentAd.description, currentAd.location, currentAd.price?.value)
-        // The toggle is enabled
-        AdsRepository.addToFavourites(newFavourite)
-        //val database = FavouriteAdsDatabase.getInstance(itemView.context)
-        */
-/* CoroutineScope(Dispatchers.IO).launch {
-             database.favouriteAdsDao.insert(newFavourite) }*//*
-
-        Toast.makeText(itemView.context, "Favourite", Toast.LENGTH_SHORT).show()
-    } else {
-        // The toggle is disabled
-        //TODO Når eg r i vis-kun-favoritter-modus, delete favouriteAd, eller er currentAd då eit objekt av klassen Favourite add?(trur det. trenger ikkje å endre noko)
-        AdsRepository.removeFromFavourites(currentAd)
-        CoroutineScope(Dispatchers.IO).launch {
-            database.favouriteAdsDao.delete(currentAd.id)
-        }
-        Toast.makeText(itemView.context, "Not favourite", Toast.LENGTH_SHORT).show()
-    }
-}
-*/

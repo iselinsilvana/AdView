@@ -9,6 +9,9 @@ interface FavouriteAdsDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert( favouriteAd : FavouriteAd)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll( vararg favouriteAds: FavouriteAd) // TODO: Endre dette til å bli kun Ads, eller adsFromWeb, elns når eg har fiksa det andre
+
     // Updates an ad already in the database
     @Update
     fun update(favouriteAd: FavouriteAd)

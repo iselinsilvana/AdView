@@ -3,6 +3,7 @@ package com.example.adview
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.adview.database.FavouriteAd
 import com.example.adview.database.FavouriteAdsDao
 import com.example.adview.database.FavouriteAdsDatabase
@@ -18,7 +19,7 @@ import retrofit2.HttpException
 class AdsRepository(application: Application) {
 
     private val webservice: RetrofitService = RetrofitFactory.makeRetrofitService()
-    private val webResponse: List<Ad>? = getAdsFromWeb()
+    private val webResponse = MutableLiveData<List<Ad>?>()
 
     private val databaseDao: FavouriteAdsDao = FavouriteAdsDatabase.getInstance(application).favouriteAdsDao
     private val favouriteAdListLiveData: LiveData<List<FavouriteAd?>> = databaseDao.getFavouriteAds()
@@ -38,7 +39,8 @@ class AdsRepository(application: Application) {
 */
 
 
-    fun getAllAds() : List<Ad>?{
+    fun getAllAds() : MutableLiveData<List<Ad>?>{
+        getAdsFromWeb()
         return webResponse
     }
 
@@ -62,15 +64,16 @@ class AdsRepository(application: Application) {
         }
     }
 
-    private fun getAdsFromWeb(): List<Ad>? {
-        var tempList : List<Ad>? = emptyList<Ad>()
+    private fun getAdsFromWeb() : MutableLiveData<List<Ad>?> {
+        webResponse.value = emptyList()
+       // var tempList = emptyList<Ad>()
         CoroutineScope(Dispatchers.IO).launch {
             val request = webservice.getAds()
             try {
                 val response = request.await()
                 if (response.isSuccessful) {
                     // Do something
-                    tempList = response.body()?.adList
+                    webResponse.postValue(response.body()!!.adList)
                 } else {
                     Log.e("Repository", "Error: ${response.code()}")
                 }
@@ -80,12 +83,15 @@ class AdsRepository(application: Application) {
                 Log.e("REQUEST", "Exception ${e.message}")
             }
         }
-        return tempList
+        //webResponse.value = tempList
+        return webResponse
     }
 }
 
+
 /*
-            val request = service.getAds()
+private fun getAdsFromWeb() {
+    val request = webservice.getAds()
             try {
                 val response = request.await()
                 //Sette det under ein annen plass?
