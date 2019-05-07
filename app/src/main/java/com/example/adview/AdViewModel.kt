@@ -61,14 +61,15 @@ class AdViewModel(application: Application) : AndroidViewModel(application) {
         return adsRepository.getAllAds()
     }*/
 
-/*    fun addToFavourites(currentAd: Ad) {
-        val newFavourite = DatabaseAd(currentAd.id, currentAd.description, currentAd.location, currentAd.price, currentAd.image)
+    fun addToFavourites(currentAd: Ad) {
+        val newFavourite = Ad(currentAd.id, currentAd.description, currentAd.location, currentAd.price, currentAd.image, isFavourite = 1)
         adsRepository.addToFavourites(newFavourite)
     }
 
     fun removeFromFavourites(currentAd: Ad) {
-        adsRepository.removeFromFavourites(currentAd.id)
-    }*/
+        val noLongerFavourite = Ad(currentAd.id, currentAd.description, currentAd.location, currentAd.price, currentAd.image, isFavourite = 0)
+        adsRepository.removeFromFavourites(noLongerFavourite)
+    }
 
 }
 

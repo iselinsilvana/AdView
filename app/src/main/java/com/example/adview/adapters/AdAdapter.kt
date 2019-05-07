@@ -58,8 +58,8 @@ class AdAdapter(val viewModel: AdViewModel) :
         holder.tglHeart.setOnClickListener {
             var state = holder.tglHeart.isChecked
             savedAdsArray.put(idOfCurrentAd, state)
-           // if (state) viewModel.addToFavourites(currentAd)
-           // else viewModel.removeFromFavourites(currentAd)
+            if (state) viewModel.addToFavourites(currentAd)
+            else viewModel.removeFromFavourites(currentAd)
         }
 
 /*        holder.tglHeart.setOnCheckedChangeListener { _, isChecked ->

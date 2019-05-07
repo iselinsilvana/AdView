@@ -30,7 +30,8 @@ fun AdResponse.asDomainModel() : List<Ad> {
             description = it.description,
             location = it.location,
             price = it.price?.value,
-            image = it.image?.url
+            image = it.image?.url,
+            isFavourite = 0
         )
     }
 }
@@ -42,6 +43,7 @@ fun AdResponse.asDatabaseModel() : Array<DatabaseAd> {
             description = it.description,
             location = it.location,
             price = it.price?.value,
-            image = it.image?.url)
+            image = it.image?.url,
+            isFavourite = 0)
     }.toTypedArray()
 }

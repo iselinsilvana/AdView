@@ -5,20 +5,24 @@ import androidx.room.*
 
 @Dao
 interface FavouriteAdsDao{
-    // Add an ad to favourites database
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(databaseAd : DatabaseAd)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll( vararg databaseAds: DatabaseAd) // TODO: Endre dette til å bli kun Ads, eller adsFromWeb, elns når eg har fiksa det andre
+    // Fetch all the ads in the favourites database
+    @Query("SELECT * from favourite_ads_table")
+    fun getAllAds() : LiveData<List<DatabaseAd>?>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertAll( vararg databaseAds: DatabaseAd)
+
+    @Query("SELECT * from favourite_ads_table where isFavourite == 1")
+    fun getAllFavourites() : LiveData<List<DatabaseAd>?>
 
     // Updates an ad already in the database
     @Update
     fun update(databaseAd: DatabaseAd)
 
-    // Fetch all the ads in the favourites database
-    @Query("SELECT * from favourite_ads_table")
-    fun getAllAds() : LiveData<List<DatabaseAd>?>
+    // Add an ad to favourites database
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(databaseAd : DatabaseAd)
 
     // Delete an ad from the database, might not be used
     @Delete

@@ -10,7 +10,8 @@ data class DatabaseAd constructor(@PrimaryKey val id: Long,
                       @ColumnInfo(name = "ad_description") val description: String?,
                       @ColumnInfo(name = "ad_location") val location: String?,
                       @ColumnInfo val price: Int?,
-                      @ColumnInfo val image: String?)
+                      @ColumnInfo val image: String?,
+                      @ColumnInfo val isFavourite: Int)
 
 fun List<DatabaseAd>.asDomainModel(): List<Ad> {
     return map {
@@ -19,7 +20,8 @@ fun List<DatabaseAd>.asDomainModel(): List<Ad> {
             description = it.description,
             location = it.location,
             price = it.price,
-            image = it.image)
+            image = it.image,
+            isFavourite = it.isFavourite)
     }
 }
 

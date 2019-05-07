@@ -5,10 +5,13 @@ import androidx.lifecycle.Transformations
 import com.example.adview.database.FavouriteAdsDatabase
 import com.example.adview.database.asDomainModel
 import com.example.adview.domain.Ad
+import com.example.adview.domain.asDatabaseModel
 import com.example.adview.model.asDatabaseModel
 import com.example.adview.network.RetrofitFactory
 import com.example.adview.network.RetrofitService
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class AdsRepository(private val database: FavouriteAdsDatabase) {
@@ -31,6 +34,24 @@ class AdsRepository(private val database: FavouriteAdsDatabase) {
             database.favouriteAdsDao.insertAll(*allAdsRefreshed!!.asDatabaseModel())
         }
     }
+
+    val favouriteAds: LiveData<List<Ad>?> = Transformations.map(database.favouriteAdsDao.getAllFavourites()) {
+        it?.asDomainModel()
+    }
+
+    fun addToFavourites(newFavourite : Ad) {
+        CoroutineScope(Dispatchers.IO).launch {
+            database.favouriteAdsDao.update(newFavourite.asDatabaseModel())
+        }
+    }
+
+    fun removeFromFavourites(adToRemove : Ad) {
+        CoroutineScope(Dispatchers.IO).launch {
+            database.favouriteAdsDao.update(adToRemove.asDatabaseModel())
+        }
+    }
+
+}
 /*
     init {
         webservice = RetrofitFactory.makeRetrofitService()
@@ -46,7 +67,6 @@ class AdsRepository(private val database: FavouriteAdsDatabase) {
 
 
  /*   fun getAllAds() : List<NetworkAd>?{
-        // TODO: må endre dette. kall denne funksjonen ein annen plass
         getAdsFromWeb()
         return webResponse
     }*/
@@ -60,19 +80,7 @@ class AdsRepository(private val database: FavouriteAdsDatabase) {
         return favouriteIdListLiveData
     }
 */
-/*
-    fun addToFavourites(newFavourite : DatabaseAd) {
-        // bør eg ha coroutines her, eller bør eg ikkje?
-        CoroutineScope(Dispatchers.IO).launch {
-            databaseDao.insert(newFavourite) }
-    }
 
-    fun removeFromFavourites(idToDelete: Long) {
-        CoroutineScope(Dispatchers.IO).launch {
-            databaseDao.delete(idToDelete)
-        }
-    }
-*/
 
 
 /*
@@ -100,7 +108,6 @@ class AdsRepository(private val database: FavouriteAdsDatabase) {
     }
 */
 
-}
 
 
 /*
