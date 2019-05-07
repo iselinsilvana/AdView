@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [FavouriteAd::class], version = 1, exportSchema = false)
+@Database(entities = [DatabaseAd::class], version = 2, exportSchema = false)
 abstract class FavouriteAdsDatabase : RoomDatabase() {
 
     abstract val favouriteAdsDao: FavouriteAdsDao
@@ -14,7 +14,7 @@ abstract class FavouriteAdsDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: FavouriteAdsDatabase? = null
 
-        fun getInstance(context: Context): FavouriteAdsDatabase{
+        fun getDatabase(context: Context): FavouriteAdsDatabase{
             synchronized(this){
                 var instance = INSTANCE
                 if(instance == null) {

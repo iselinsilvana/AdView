@@ -1,12 +1,11 @@
 package com.example.adview.model
 
-import androidx.lifecycle.LiveData
-import com.example.adview.database.FavouriteAd
+import com.example.adview.database.DatabaseAd
+import com.example.adview.domain.Ad
 import com.squareup.moshi.Json
 
-
 data class AdResponse(
-    @field:Json(name = "items") val networkAdList: List<NetworkAd>
+    @field:Json(name = "items") val adList: List<NetworkAd>
 )
 
 data class NetworkAd(@field:Json(name = "id") val id: Long,
@@ -23,11 +22,26 @@ data class Price(
     @field:Json(name = "value") val value: Int        //har eg aldri desimal? kan holde opp til 9 nuller, bør bruke long for mulighet til å holde fleire?
 )
 
-fun AdResponse.asDatabaseModel() : List<Ad> {
-    return ads.map{
+
+fun AdResponse.asDomainModel() : List<Ad> {
+    return adList.map{
         Ad(
             id = it.id,
-            desc
+            description = it.description,
+            location = it.location,
+            price = it.price?.value,
+            image = it.image?.url
         )
     }
+}
+
+fun AdResponse.asDatabaseModel() : Array<DatabaseAd> {
+    return adList.map{
+        DatabaseAd(
+            id = it.id,
+            description = it.description,
+            location = it.location,
+            price = it.price?.value,
+            image = it.image?.url)
+    }.toTypedArray()
 }

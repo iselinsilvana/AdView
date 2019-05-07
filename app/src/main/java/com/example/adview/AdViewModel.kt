@@ -4,17 +4,15 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.adview.database.FavouriteAd
-import com.example.adview.model.Ad
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import com.example.adview.database.DatabaseAd
+import com.example.adview.database.FavouriteAdsDatabase.Companion.getDatabase
+import com.example.adview.domain.Ad
+import kotlinx.coroutines.*
 
 class AdViewModel(application: Application) : AndroidViewModel(application) {
 
-    lateinit var adsRepository: AdsRepository
     // viewModelJob allows us to cancel all coroutines started by this ViewModel.
-    private var viewModelJob = Job()
+    private var viewModelJob = SupervisorJob()
     /**
      * A [CoroutineScope] keeps track of all coroutines started by this ViewModel.
      *
@@ -26,33 +24,51 @@ class AdViewModel(application: Application) : AndroidViewModel(application) {
      * a [ViewModel] update the UI after performing some processing.
      */
 
+    private val viewModelScope = CoroutineScope(viewModelJob + Dispatchers.Main)
+
+    private val database = getDatabase(application)
+    private val adsRepository = AdsRepository(database)
+
+    init {
+        viewModelScope.launch {
+            adsRepository.refreshAds()
+        }
+    }
+
+    val allAds = adsRepository.ads
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
+    }
+
     // ka trenger eg denne til ?
     //private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     //private val currentAd = Ad?
     //Henter repository
-    lateinit var favouriteAds : LiveData<List<FavouriteAd?>>
+    lateinit var favouriteAds : LiveData<List<DatabaseAd?>>
     lateinit var favouriteIds : LiveData<List<Long>?>
-    lateinit var allAds : MutableLiveData<List<Ad>?>
+   // lateinit var allAds : MutableLiveData<List<Ad>?>
 
-    fun vievModelConnectToDataSource() {
-        adsRepository = AdsRepository(getApplication())
+/*    fun vievModelConnectToDataSource() {
+        //adsRepository = AdsRepository(getApplication())
         favouriteAds = adsRepository.getAllFavouriteAds()
         favouriteIds = adsRepository.getAllFavouriteIds()
-        allAds = adsRepository.getAllAds()
+       // allAds = adsRepository.getAllAds()
     }
     fun viewModelConnectToAllAds () : MutableLiveData<List<Ad>?>{
         adsRepository = AdsRepository(getApplication())
         return adsRepository.getAllAds()
-    }
+    }*/
 
-    fun addToFavourites(currentAd: Ad) {
-        val newFavourite = FavouriteAd(currentAd.id, currentAd.description, currentAd.location, currentAd.price?.value)
+/*    fun addToFavourites(currentAd: Ad) {
+        val newFavourite = DatabaseAd(currentAd.id, currentAd.description, currentAd.location, currentAd.price, currentAd.image)
         adsRepository.addToFavourites(newFavourite)
     }
 
     fun removeFromFavourites(currentAd: Ad) {
         adsRepository.removeFromFavourites(currentAd.id)
-    }
+    }*/
 
 }
 

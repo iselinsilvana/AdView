@@ -1,7 +1,6 @@
 package com.example.adview.network
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+
 import com.example.adview.model.AdResponse
 import kotlinx.coroutines.Deferred
 import retrofit2.Response

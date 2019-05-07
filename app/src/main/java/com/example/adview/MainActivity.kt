@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.adview.adapters.AdAdapter
-import com.example.adview.model.Ad
+import com.example.adview.domain.Ad
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -34,18 +34,18 @@ class MainActivity : AppCompatActivity() {
         val viewModelFactory = AdViewModelFactory(application)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(AdViewModel::class.java)
         viewManager = GridLayoutManager(this, 2)
-        viewModel.viewModelConnectToAllAds().observe(this, Observer { temp ->
-            Log.i("TEST", "Init new ads layout")
-           initRecyclerView(temp)
-        })
-        actionBar?.title = "Showing all ads"
 
-        /*getViewModel().getAdListResponse().observe(this, adListResponse -> {
+        viewModel.allAds.observe(this, Observer { adList ->
+            Log.i("TEST", "Init new ads layout")
+            initRecyclerView(adList) })
+
+/*
+        getViewModel().getAdListResponse().observe(this, adListResponse -> {
                 Timber.i(“Response received ->” + adListResponse.size);
                 this.adListResponse = adListResponse;
                 initializeView();//initialise all the views
             });
-            */
+*/
 
     }
 

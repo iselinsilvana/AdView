@@ -1,30 +1,36 @@
 package com.example.adview
 
-import android.app.Application
-import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.example.adview.database.FavouriteAd
-import com.example.adview.database.FavouriteAdsDao
+import androidx.lifecycle.Transformations
 import com.example.adview.database.FavouriteAdsDatabase
-import com.example.adview.model.Ad
+import com.example.adview.database.asDomainModel
+import com.example.adview.domain.Ad
+import com.example.adview.model.asDatabaseModel
 import com.example.adview.network.RetrofitFactory
 import com.example.adview.network.RetrofitService
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
 
-class AdsRepository(application: Application) {
+class AdsRepository(private val database: FavouriteAdsDatabase) {
 
     private val webservice: RetrofitService = RetrofitFactory.makeRetrofitService()
-    private val webResponse = MutableLiveData<List<Ad>?>()
+    //private val webResponse = List<NetworkAd>()
 
-    private val databaseDao: FavouriteAdsDao = FavouriteAdsDatabase.getInstance(application).favouriteAdsDao
-    private val favouriteAdListLiveData: LiveData<List<FavouriteAd?>> = databaseDao.getFavouriteAds()
-    private val favouriteIdListLiveData: LiveData<List<Long>?> = databaseDao.getAllIds()
+    //private val databaseDao: FavouriteAdsDao = FavouriteAdsDatabase.getInstance(application).favouriteAdsDao
+    //private val favouriteAdListLiveData: LiveData<List<DatabaseAd>?> = databaseDao.getAllAds()
+   // private val favouriteIdListLiveData: LiveData<List<Long>?> = databaseDao.getAllIds()
 
+
+    val ads: LiveData<List<Ad>> = Transformations.map(database.favouriteAdsDao.getAllAds()) {
+        it?.asDomainModel()
+    }
+
+    suspend fun refreshAds() {
+        withContext(Dispatchers.IO) {
+            var allAdsRefreshed = webservice.getAds().await().body()
+            database.favouriteAdsDao.insertAll(*allAdsRefreshed!!.asDatabaseModel())
+        }
+    }
 /*
     init {
         webservice = RetrofitFactory.makeRetrofitService()
@@ -33,26 +39,29 @@ class AdsRepository(application: Application) {
         val database = FavouriteAdsDatabase.getInstance(application).favouriteAdsDao
         databaseDao = database.favouriteAdsDao
         // Bør desse to vere i dispatchers.IO, eller blir det gjort når ein kaller det i VM?
-        favouriteAdListLiveData = databaseDao.getFavouriteAds()
+        favouriteAdListLiveData = databaseDao.getAllAds()
         favouriteIdListLiveData = databaseDao.getAllIds()
         }
 */
 
 
-    fun getAllAds() : MutableLiveData<List<Ad>?>{
+ /*   fun getAllAds() : List<NetworkAd>?{
+        // TODO: må endre dette. kall denne funksjonen ein annen plass
         getAdsFromWeb()
         return webResponse
-    }
+    }*/
+/*
 
-    fun getAllFavouriteAds() : LiveData<List<FavouriteAd?>>{
+    fun getAllFavouriteAds() : LiveData<List<DatabaseAd>?>{
         return favouriteAdListLiveData
     }
 
     fun getAllFavouriteIds() : LiveData<List<Long>?> {
         return favouriteIdListLiveData
     }
-
-    fun addToFavourites(newFavourite : FavouriteAd) {
+*/
+/*
+    fun addToFavourites(newFavourite : DatabaseAd) {
         // bør eg ha coroutines her, eller bør eg ikkje?
         CoroutineScope(Dispatchers.IO).launch {
             databaseDao.insert(newFavourite) }
@@ -63,17 +72,20 @@ class AdsRepository(application: Application) {
             databaseDao.delete(idToDelete)
         }
     }
+*/
 
-    private fun getAdsFromWeb() : MutableLiveData<List<Ad>?> {
-        webResponse.value = emptyList()
-       // var tempList = emptyList<Ad>()
+
+/*
+    private fun getAdsFromWeb() : AdResponse? {
+       // webResponse.value = emptyList()
+        var tempList : AdResponse? = emptyList<NetworkAd>()
         CoroutineScope(Dispatchers.IO).launch {
             val request = webservice.getAds()
             try {
                 val response = request.await()
                 if (response.isSuccessful) {
                     // Do something
-                    webResponse.postValue(response.body()!!.adList)
+                    tempList = (response.body())
                 } else {
                     Log.e("Repository", "Error: ${response.code()}")
                 }
@@ -84,8 +96,10 @@ class AdsRepository(application: Application) {
             }
         }
         //webResponse.value = tempList
-        return webResponse
+        return tempList
     }
+*/
+
 }
 
 

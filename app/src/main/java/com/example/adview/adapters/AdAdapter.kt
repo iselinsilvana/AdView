@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.adview.AdViewModel
 import com.example.adview.R
-import com.example.adview.model.Ad
+import com.example.adview.domain.Ad
 import java.text.DecimalFormat
 
 class AdAdapter(val viewModel: AdViewModel) :
@@ -58,14 +58,14 @@ class AdAdapter(val viewModel: AdViewModel) :
         holder.tglHeart.setOnClickListener {
             var state = holder.tglHeart.isChecked
             savedAdsArray.put(idOfCurrentAd, state)
-            if (state) viewModel.addToFavourites(currentAd)
-            else viewModel.removeFromFavourites(currentAd)
+           // if (state) viewModel.addToFavourites(currentAd)
+           // else viewModel.removeFromFavourites(currentAd)
         }
 
 /*        holder.tglHeart.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 // The toggle is enabled
-                // val newFavourite = FavouriteAd(currentAd.id, currentAd.description, currentAd.location, currentAd.price?.value)
+                // val newFavourite = DatabaseAd(currentAd.id, currentAd.description, currentAd.location, currentAd.price?.value)
                 viewModel.addToFavourites(currentAd)
                 savedAdsArray.put(idOfCurrentAd, true)
                 Log.i("TEST", "$idOfCurrentAd was added to the array.")
@@ -94,13 +94,14 @@ class AdAdapter(val viewModel: AdViewModel) :
             val price = if (currentAd.price == null) {
                 "no price info"
             } else {
-                "${dec.format(currentAd.price.value)} kr"
+                "${dec.format(currentAd.price)} kr"
             }
             tvPrice.text = price
             tvPlace.text = currentAd.location ?: "no location"
             tvTitle.text = currentAd.description ?: "no description"
+            // TODO: finn ut kva som skjer om det ikkje er eit bilde
             Glide.with(holder.ivImage.context)
-                .load("https://images.finncdn.no/dynamic/480x360c/" + currentAd.image?.url).centerCrop().into(ivImage)
+                .load("https://images.finncdn.no/dynamic/480x360c/" + currentAd.image).centerCrop().into(ivImage)
             // use the sparse boolean array to check the hearts
             tglHeart.isChecked = (savedAdsArray.get(currentAd.id.toInt()))
 
@@ -117,7 +118,7 @@ class AdAdapter(val viewModel: AdViewModel) :
             tglHeart.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     addToFavourites(currentAd)
-                    val newFavourite = FavouriteAd(currentAd.id, currentAd.description, currentAd.location, currentAd.price?.value)
+                    val newFavourite = DatabaseAd(currentAd.id, currentAd.description, currentAd.location, currentAd.price?.value)
                     // The toggle is enabled
                     Toast.makeText(itemView.context, "Favourite", Toast.LENGTH_SHORT).show()
                 } else {
