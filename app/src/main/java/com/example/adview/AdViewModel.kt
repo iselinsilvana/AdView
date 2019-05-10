@@ -1,9 +1,13 @@
 package com.example.adview
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import com.example.adview.adapters.AdAdapter
 import com.example.adview.database.DatabaseAd
 import com.example.adview.database.FavouriteAdsDatabase.Companion.getDatabase
 import com.example.adview.domain.Ad
@@ -29,13 +33,26 @@ class AdViewModel(application: Application) : AndroidViewModel(application) {
     private val database = getDatabase(application)
     private val adsRepository = AdsRepository(database)
 
+    val allAds:LiveData<List<Ad>?> = adsRepository.ads
+    val favouriteAdsList = adsRepository.favouriteAds
+    var currentAdList = MutableLiveData<List<Ad>?>()
+
     init {
         viewModelScope.launch {
-            adsRepository.refreshAds()
+            adsRepository.refreshAds(
+            )
         }
     }
 
-    val allAds = adsRepository.ads
+
+    fun changeAdList(isAllAdsCurrentlyShowing : Boolean) {
+         if (!isAllAdsCurrentlyShowing) {
+             currentAdList.postValue(favouriteAdsList.value)
+         }
+        else {
+             currentAdList.postValue(allAds.value) }
+        //Log.i("TEST!", "changeAdList called. current ad list size is ${currentAdList?.size}.")
+    }
 
     override fun onCleared() {
         super.onCleared()
@@ -46,8 +63,8 @@ class AdViewModel(application: Application) : AndroidViewModel(application) {
     //private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     //private val currentAd = Ad?
     //Henter repository
-    lateinit var favouriteAds : LiveData<List<DatabaseAd?>>
-    lateinit var favouriteIds : LiveData<List<Long>?>
+    //lateinit var favouriteAds : LiveData<List<DatabaseAd?>>
+    //lateinit var favouriteIds : LiveData<List<Long>?>
    // lateinit var allAds : MutableLiveData<List<Ad>?>
 
 /*    fun vievModelConnectToDataSource() {

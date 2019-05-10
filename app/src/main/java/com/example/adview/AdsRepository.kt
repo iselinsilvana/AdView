@@ -1,5 +1,6 @@
 package com.example.adview
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.example.adview.database.FavouriteAdsDatabase
@@ -24,9 +25,14 @@ class AdsRepository(private val database: FavouriteAdsDatabase) {
    // private val favouriteIdListLiveData: LiveData<List<Long>?> = databaseDao.getAllIds()
 
 
-    val ads: LiveData<List<Ad>> = Transformations.map(database.favouriteAdsDao.getAllAds()) {
+    val favouriteAds: LiveData<List<Ad>?> = Transformations.map(database.favouriteAdsDao.getAllFavourites()) {
         it?.asDomainModel()
     }
+    val ads: LiveData<List<Ad>?> = Transformations.map(database.favouriteAdsDao.getAllAds()) {
+        it?.asDomainModel()
+    }
+
+
 
     suspend fun refreshAds() {
         withContext(Dispatchers.IO) {
@@ -35,9 +41,6 @@ class AdsRepository(private val database: FavouriteAdsDatabase) {
         }
     }
 
-    val favouriteAds: LiveData<List<Ad>?> = Transformations.map(database.favouriteAdsDao.getAllFavourites()) {
-        it?.asDomainModel()
-    }
 
     fun addToFavourites(newFavourite : Ad) {
         CoroutineScope(Dispatchers.IO).launch {

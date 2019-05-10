@@ -13,10 +13,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.adview.adapters.AdAdapter
 import com.example.adview.domain.Ad
-import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var recyclerViewAdapter: AdAdapter
     private lateinit var viewModel: AdViewModel
     private lateinit var viewManager: GridLayoutManager
     private lateinit var recyclerView: RecyclerView
@@ -28,60 +28,73 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //to change title of activity
+        val actionBar = supportActionBar
+        actionBar!!.title = "New Title"
+
+
         // val dataSource = AdsRepository(application)
         //get vm to fetch the datasource
         //observe vievmodel
         val viewModelFactory = AdViewModelFactory(application)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(AdViewModel::class.java)
         viewManager = GridLayoutManager(this, 2)
+        recyclerViewAdapter = AdAdapter(viewModel)
 
-        viewModel.allAds.observe(this, Observer { adList ->
-            Log.i("TEST", "Init new ads layout")
-            initRecyclerView(adList) })
+        initRecyclerView(emptyList())
 
-/*
-        getViewModel().getAdListResponse().observe(this, adListResponse -> {
-                Timber.i(“Response received ->” + adListResponse.size);
-                this.adListResponse = adListResponse;
-                initializeView();//initialise all the views
-            });
-*/
+        viewModel.allAds.observe(this, Observer {
+        })
+
+        viewModel.favouriteAdsList.observe(this, Observer { adListToDisplay ->
+            if (!showingAllAds) (recyclerView.adapter as AdAdapter).loadAds(adListToDisplay)
+
+        })
+
+        viewModel.currentAdList.observe(this, Observer { adListToDisplay ->
+            Log.i("TEST", "this is observer, will now call initRecyclerView")
+            (recyclerView.adapter as AdAdapter).loadAds(adListToDisplay)
+        })
 
     }
 
-    fun initRecyclerView(listOfAds: List<Ad>?) {
+    private fun initRecyclerView(listOfAds: List<Ad>?) {
+        Log.i("TEST!", "initRecyclerView called")
         recyclerView = findViewById<RecyclerView>(R.id.recycler_view).apply {
             setHasFixedSize(true)
             layoutManager = viewManager
-            val adapter = AdAdapter(viewModel)
-            recycler_view.adapter = adapter
-            adapter.loadAds(listOfAds)
+            adapter = recyclerViewAdapter
+            (adapter as AdAdapter).loadAds(listOfAds)
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
         inflater.inflate(R.menu.app_menu, menu)
-        val menuItemShowAllAds = menu?.findItem(R.id.show_all_ads)
+        //val menuItemShowAllAds = menu?.findItem(R.id.show_all_ads)
         val menuItemShowFavs = menu?.findItem(R.id.show_only_favourites)
-        menuItemShowAllAds?.setVisible(!showingAllAds)
-        menuItemShowFavs?.setVisible(showingAllAds)
+        //menuItemShowAllAds?.isVisible = !showingAllAds
+        menuItemShowFavs?.isVisible
         return true
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
 
+        val actionBar = supportActionBar
         val menuItemShowAllAds = menu?.findItem(R.id.show_all_ads)
         val menuItemShowFavs = menu?.findItem(R.id.show_only_favourites)
-        if (showingAllAds) actionBar?.title = "Showing all ads"
-        else actionBar?.title = "Showing favourite ads"
-        menuItemShowAllAds?.setVisible(!showingAllAds)
-        menuItemShowFavs?.setVisible(showingAllAds)
+        if (showingAllAds) actionBar!!.title = "Showing all ads"
+        else actionBar!!.title = "Showing favourite ads"
+        menuItemShowAllAds?.isVisible = !showingAllAds
+        menuItemShowFavs?.isVisible = showingAllAds
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         updateMenuDisplay()
+        viewModel.changeAdList(showingAllAds)
+        Log.i("TEST main", "selscted to view other list. the new list has size ${viewModel.currentAdList.value?.size}")
+        initRecyclerView(viewModel.currentAdList.value)
         return true
     }
 
@@ -90,7 +103,7 @@ class MainActivity : AppCompatActivity() {
         invalidateOptionsMenu()
     }
 /*
-        val adapter = AdAdapter(viewModel)
+        val recyclerViewAdapter = AdAdapter(viewModel)
         recycler_view.layoutManager = GridLayoutManager(this, 2)
 */
 
@@ -127,7 +140,7 @@ class MainActivity : AppCompatActivity() {
             recyclerView = findViewById<RecyclerView>(R.id.recycler_view).apply {
                 setHasFixedSize(true)
                 layoutManager = viewManager
-                adapter = viewAdapter
+                recyclerViewAdapter = viewAdapter
 
         }
     }*/

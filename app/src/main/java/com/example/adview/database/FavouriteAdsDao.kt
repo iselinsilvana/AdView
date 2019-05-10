@@ -7,13 +7,13 @@ import androidx.room.*
 interface FavouriteAdsDao{
 
     // Fetch all the ads in the favourites database
-    @Query("SELECT * from favourite_ads_table")
+    @Query("SELECT * FROM favourite_ads_table")
     fun getAllAds() : LiveData<List<DatabaseAd>?>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertAll( vararg databaseAds: DatabaseAd)
 
-    @Query("SELECT * from favourite_ads_table where isFavourite == 1")
+    @Query("SELECT * FROM favourite_ads_table WHERE isFavourite = 1")
     fun getAllFavourites() : LiveData<List<DatabaseAd>?>
 
     // Updates an ad already in the database
@@ -22,7 +22,7 @@ interface FavouriteAdsDao{
 
     // Add an ad to favourites database
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(databaseAd : DatabaseAd)
+    suspend fun insertOne(databaseAd : DatabaseAd)
 
     // Delete an ad from the database, might not be used
     @Delete

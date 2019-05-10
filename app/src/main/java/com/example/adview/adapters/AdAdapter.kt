@@ -1,16 +1,10 @@
 package com.example.adview.adapters
 
-
 import android.util.Log
-import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.adview.AdViewModel
@@ -28,10 +22,6 @@ class AdAdapter(val viewModel: AdViewModel) :
         adList = newAds
         notifyDataSetChanged()
     }
-
-    //TODO: Flytt denne til databasen
-    var savedAdsArray = SparseBooleanArray()
-
 
 
     // Create new views (invoked by the layout manager)
@@ -53,13 +43,16 @@ class AdAdapter(val viewModel: AdViewModel) :
         // TODO: må fikse at denne kan vere null, for det kan den jo
         val currentAd = adList!![position]
         holder.bind(currentAd, holder)
-        val idOfCurrentAd = adList!![position].id.toInt()
 
         holder.tglHeart.setOnClickListener {
             var state = holder.tglHeart.isChecked
-            savedAdsArray.put(idOfCurrentAd, state)
-            if (state) viewModel.addToFavourites(currentAd)
-            else viewModel.removeFromFavourites(currentAd)
+            //savedAdsArray.put(idOfCurrentAd, state)
+            if (state) {viewModel.addToFavourites(currentAd)
+                Toast.makeText(it.context, "added to favourites", Toast.LENGTH_SHORT).show()
+            }
+            else {viewModel.removeFromFavourites(currentAd)
+                Toast.makeText(it.context, "removed from favourites", Toast.LENGTH_SHORT).show()
+            }
         }
 
 /*        holder.tglHeart.setOnCheckedChangeListener { _, isChecked ->
@@ -87,7 +80,6 @@ class AdAdapter(val viewModel: AdViewModel) :
         val ivImage: ImageView = v.findViewById(R.id.iv_item_photo)
         val tglHeart: ToggleButton = v.findViewById(R.id.btn_favourite)
 
-        //val database = FavouriteAdsDatabase.getInstance(itemView.context)
 
         fun bind(currentAd: Ad, holder: AdViewHolder) {
             val dec = DecimalFormat("#,###.##")
@@ -102,8 +94,7 @@ class AdAdapter(val viewModel: AdViewModel) :
             // TODO: finn ut kva som skjer om det ikkje er eit bilde
             Glide.with(holder.ivImage.context)
                 .load("https://images.finncdn.no/dynamic/480x360c/" + currentAd.image).centerCrop().into(ivImage)
-            // use the sparse boolean array to check the hearts
-            tglHeart.isChecked = (savedAdsArray.get(currentAd.id.toInt()))
+            tglHeart.isChecked = (currentAd.isFavourite != 0)
 
 
 /*            var isAdInDb = false

@@ -1,6 +1,5 @@
 package com.example.adview.domain
 
-import androidx.lifecycle.Transformations.map
 import com.example.adview.database.DatabaseAd
 
 data class Ad(val id: Long,
