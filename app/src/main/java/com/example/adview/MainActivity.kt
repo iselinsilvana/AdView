@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.adview.adapters.AdAdapter
 import com.example.adview.domain.Ad
+import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -20,7 +21,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: AdViewModel
     private lateinit var viewManager: GridLayoutManager
     private lateinit var recyclerView: RecyclerView
-    // Er det best å ha denne her, eller i onCreate?
+
+
     private var showingAllAds = true
 
 
@@ -33,9 +35,6 @@ class MainActivity : AppCompatActivity() {
         actionBar!!.title = "New Title"
 
 
-        // val dataSource = AdsRepository(application)
-        //get vm to fetch the datasource
-        //observe vievmodel
         val viewModelFactory = AdViewModelFactory(application)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(AdViewModel::class.java)
         viewManager = GridLayoutManager(this, 2)
@@ -52,14 +51,15 @@ class MainActivity : AppCompatActivity() {
         })
 
         viewModel.currentAdList.observe(this, Observer { adListToDisplay ->
-            Log.i("TEST", "this is observer, will now call initRecyclerView")
+            Log.i("MainActivity", "this is observer of curentAdList, will now call initRecyclerView")
             (recyclerView.adapter as AdAdapter).loadAds(adListToDisplay)
         })
+
+        swiperefresh.setOnRefreshListener { refresh() }
 
     }
 
     private fun initRecyclerView(listOfAds: List<Ad>?) {
-        Log.i("TEST!", "initRecyclerView called")
         recyclerView = findViewById<RecyclerView>(R.id.recycler_view).apply {
             setHasFixedSize(true)
             layoutManager = viewManager
@@ -71,18 +71,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
         inflater.inflate(R.menu.app_menu, menu)
-        //val menuItemShowAllAds = menu?.findItem(R.id.show_all_ads)
-        val menuItemShowFavs = menu?.findItem(R.id.show_only_favourites)
-        //menuItemShowAllAds?.isVisible = !showingAllAds
-        menuItemShowFavs?.isVisible
+        val menuItemShowAllAds = menu?.findItem(R.id.menu_show_all_ads)
+        menuItemShowAllAds?.isVisible = false
         return true
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
 
         val actionBar = supportActionBar
-        val menuItemShowAllAds = menu?.findItem(R.id.show_all_ads)
-        val menuItemShowFavs = menu?.findItem(R.id.show_only_favourites)
+        val menuItemShowAllAds = menu?.findItem(R.id.menu_show_all_ads)
+        val menuItemShowFavs = menu?.findItem(R.id.menu_show_only_favourites)
         if (showingAllAds) actionBar!!.title = "Showing all ads"
         else actionBar!!.title = "Showing favourite ads"
         menuItemShowAllAds?.isVisible = !showingAllAds
@@ -91,58 +89,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        updateMenuDisplay()
-        viewModel.changeAdList(showingAllAds)
-        Log.i("TEST main", "selscted to view other list. the new list has size ${viewModel.currentAdList.value?.size}")
-        initRecyclerView(viewModel.currentAdList.value)
+
+        when (item?.itemId) {
+            R.id.menu_show_only_favourites -> {
+                showingAllAds = false
+                viewModel.changeAdList(showingAllAds)
+            }
+            R.id.menu_show_all_ads -> {
+                showingAllAds = true
+                viewModel.changeAdList(showingAllAds)
+            }
+            R.id.menu_refresh -> refresh()
+        }
+        invalidateOptionsMenu()
         return true
     }
 
-    private fun updateMenuDisplay() {
-        showingAllAds = !showingAllAds
-        invalidateOptionsMenu()
+    private fun refresh() {
+        if (showingAllAds) viewModel.refresh()
+        viewModel.changeAdList(showingAllAds)
+        swiperefresh.isRefreshing = false
     }
-/*
-        val recyclerViewAdapter = AdAdapter(viewModel)
-        recycler_view.layoutManager = GridLayoutManager(this, 2)
-*/
-
-      //  initRecyclerView(emptyList())
-
-      //  viewModel.allAds
-/*
-        val service = RetrofitFactory.makeRetrofitService()
-        CoroutineScope(Dispatchers.IO).launch {
-            val request = service.getAds()
-            try {
-                val response = request.await()
-                withContext(Dispatchers.Main) {
-                    if (response.isSuccessful) {
-                        response.body()?.let { initRecyclerView(it.adList) }
-                    } else {
-                        // toast("Error network operation failed with ${response.code()}") <-- finn ut koffor toast ikkje blei godkjent
-                        Log.e("REQUEST","Error network operation failed with ${response.code()}" )
-                    }
-                }
-            } catch (e: HttpException) {
-                Log.e("REQUEST", "Exception ${e.message}")
-            } catch (e: Throwable) {
-                Log.e("REQUEST", "Exception ${e.message}")
-            }
-        }
-        */
-
-/*
-        private fun initRecyclerView( listOfAds: List<Ad>) {
-            viewManager = GridLayoutManager(this, 2)
-            viewAdapter = AdAdapter(listOfAds)
-
-            recyclerView = findViewById<RecyclerView>(R.id.recycler_view).apply {
-                setHasFixedSize(true)
-                layoutManager = viewManager
-                recyclerViewAdapter = viewAdapter
-
-        }
-    }*/
-
 }

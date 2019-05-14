@@ -29,13 +29,6 @@
                 android:background="@drawable/favourite_button"
                 android:layout_gravity="end"
                 android:layout_margin="8dp"/>
-     <!--   <ImageButton
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/favourite_button"
-                android:backgroundTint="@android:color/transparent"
-                android:layout_gravity="end"
-                android:layout_margin="8dp"/> -->
         <TextView
                 android:id="@+id/tv_item_price"
                 android:layout_width="wrap_content"

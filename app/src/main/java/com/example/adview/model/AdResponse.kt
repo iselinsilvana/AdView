@@ -15,11 +15,11 @@ data class NetworkAd(@field:Json(name = "id") val id: Long,
               @field:Json(name = "image") val image: Image?)
 
 data class Image(
-    @field:Json(name = "url") val url: String     //bruke string, eller noko anna?
+    @field:Json(name = "url") val url: String
 )
 
 data class Price(
-    @field:Json(name = "value") val value: Int        //har eg aldri desimal? kan holde opp til 9 nuller, bør bruke long for mulighet til å holde fleire?
+    @field:Json(name = "value") val value: Int
 )
 
 

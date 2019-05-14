@@ -51,7 +51,6 @@ class AdViewModel(application: Application) : AndroidViewModel(application) {
          }
         else {
              currentAdList.postValue(allAds.value) }
-        //Log.i("TEST!", "changeAdList called. current ad list size is ${currentAdList?.size}.")
     }
 
     override fun onCleared() {
@@ -59,24 +58,9 @@ class AdViewModel(application: Application) : AndroidViewModel(application) {
         viewModelJob.cancel()
     }
 
-    // ka trenger eg denne til ?
-    //private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
-    //private val currentAd = Ad?
-    //Henter repository
-    //lateinit var favouriteAds : LiveData<List<DatabaseAd?>>
-    //lateinit var favouriteIds : LiveData<List<Long>?>
-   // lateinit var allAds : MutableLiveData<List<Ad>?>
-
-/*    fun vievModelConnectToDataSource() {
-        //adsRepository = AdsRepository(getApplication())
-        favouriteAds = adsRepository.getAllFavouriteAds()
-        favouriteIds = adsRepository.getAllFavouriteIds()
-       // allAds = adsRepository.getAllAds()
+    fun refresh() {
+        adsRepository.refreshAds()
     }
-    fun viewModelConnectToAllAds () : MutableLiveData<List<Ad>?>{
-        adsRepository = AdsRepository(getApplication())
-        return adsRepository.getAllAds()
-    }*/
 
     fun addToFavourites(currentAd: Ad) {
         val newFavourite = Ad(currentAd.id, currentAd.description, currentAd.location, currentAd.price, currentAd.image, isFavourite = 1)
@@ -87,6 +71,5 @@ class AdViewModel(application: Application) : AndroidViewModel(application) {
         val noLongerFavourite = Ad(currentAd.id, currentAd.description, currentAd.location, currentAd.price, currentAd.image, isFavourite = 0)
         adsRepository.removeFromFavourites(noLongerFavourite)
     }
-
 }
 

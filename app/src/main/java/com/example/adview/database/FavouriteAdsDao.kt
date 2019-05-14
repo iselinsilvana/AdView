@@ -20,19 +20,5 @@ interface FavouriteAdsDao{
     @Update
     fun update(databaseAd: DatabaseAd)
 
-    // Add an ad to favourites database
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOne(databaseAd : DatabaseAd)
 
-    // Delete an ad from the database, might not be used
-    @Delete
-    fun delete(databaseAd: DatabaseAd)
-
-    // Deletes an ad from the favourites database based on the id number of the ad.
-    @Query("DELETE from favourite_ads_table where id = :adId")
-    fun delete( adId: Long)
-
-    // Returns a list of the id for all the favourite ads
-    @Query("SELECT id from favourite_ads_table")
-    fun getAllIds() : LiveData<List<Long>?>
 }
